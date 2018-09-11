@@ -8,10 +8,13 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+	"strings"
+	"strconv"
 )
 
 const Mode = "RESTART_MODE"
 const WORKER = "WORKER"
+const DirectReturn = 4
 
 func Run(fn func()) {
 	mode := os.Getenv(Mode)
@@ -48,9 +51,15 @@ func runMaster(d time.Duration) {
 			log.Fatalln("Cannot start subprocess, exit with err:", err)
 		}
 
+		var directExit bool
 		subProcessCtx, subProcessCancel := context.WithCancel(context.Background())
 		go func() {
-			cmd.Wait()
+			err := cmd.Wait()
+			if err != nil{
+				if strings.Contains(err.Error(), strconv.Itoa(DirectReturn)){
+					directExit = true
+				}
+			}
 			subProcessCancel()
 		}()
 
@@ -72,6 +81,10 @@ func runMaster(d time.Duration) {
 			}
 			os.Exit(0)
 		case <-subProcessCtx.Done():
+			if directExit {
+				log.Println("subprocess exit with code: 4, direct exit")
+				os.Exit(4)
+			}
 		case <-stopWorker:
 			err := cmd.Process.Kill()
 			if err != nil {
