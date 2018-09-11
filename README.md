@@ -4,7 +4,8 @@
 ```https://github.com/Petelin/restart```
 
 ### use in command 
-https://github.com/Petelin/restart
+```go install github.com/Petelin/restart/restart```
+then use `restart <shell command>`
 
 ### What is it?
 Main idea is create a subprocess to run the real job. the main process monitor it, restart it if err happen, or kill it after a while.
