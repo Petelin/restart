@@ -5,7 +5,10 @@
 
 ### use in command 
 ```go install github.com/Petelin/restart/restart```
-then use `restart <shell command>`
+
+then use `restart "<bash command>"` 
+
+this is equal to run `bash -c "<bash command>"` but with auto restart if command exit.
 
 ### What is it?
 Main idea is create a subprocess to run the real job. the main process monitor it, restart it if err happen, or kill it after a while.
